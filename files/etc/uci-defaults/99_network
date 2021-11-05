@@ -1,0 +1,62 @@
+# Remove wan since we will not need it.
+uci -q batch <<-EOT >/dev/null
+        delete network.wan
+        delete dhcp.wan
+        commit
+EOT
+
+# Disable the IPv6 LAN interface
+uci -q batch <<-EOT >/dev/null
+        set network.lan.ipv6=0
+        commit network
+EOT
+
+# disable RA and DHCP on LAN
+uci -q batch <<-EOT >/dev/null
+        set dhcp.lan.dhcp=disabled
+        set dhcp.lan.dhcpv6=disabled
+        delete dhcp.lan.ra
+        delete dhcp.lan.ra_slaac
+        delete dhcp.lan.ra_flags
+        commit dhcp
+EOT
+
+# Delete the IPv6 ULA Prefix:
+uci -q delete network.globals.ula_prefix >/dev/null
+uci commit network
+
+# Remove current lan config
+uci -q batch <<-EOT >/dev/null
+        delete network.lan.ifname
+        delete network.lan.force_link
+        delete network.lan.type
+        delete network.lan.proto
+        delete network.lan.ipaddr
+        delete network.lan.netmask
+        delete network.lan.ip6assign
+        delete network.@device[-1]
+        commit network
+EOT
+
+# Set eth0 as LAN interface (DHCP)
+uci -q batch <<-EOT >/dev/null
+        set network.lan=interface
+        set network.lan.ifname='eth0'
+        set network.lan.device='eth0'
+        set network.lan.proto='dhcp'
+        set network.lan.delegate=0
+        commit network
+EOT
+
+# To identify better when connected to SSH and when seen on the network
+uci -q batch <<-EOT >/dev/null
+        set system.@system[0].hostname=%UPSHOSTNAME%
+        set network.lan.hostname="`uci get system.@system[0].hostname`"
+        commit
+EOT
+
+sync
+
+/etc/init.d/network restart
+
+exit 0

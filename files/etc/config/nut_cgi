@@ -1,0 +1,7 @@
+config upsset
+        option enable 1
+
+config host
+        option upsname %UPSNAME%
+        option hostname localhost
+        option displayname "%UPSDESC%"

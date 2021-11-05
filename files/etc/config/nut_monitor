@@ -1,0 +1,8 @@
+config upsmon 'upsmon'
+
+config master
+        option upsname %UPSNAME%
+        option hostname localhost
+        option powervalue 1
+        option username %UPSUSER%
+        option password %UPSPASSWD%

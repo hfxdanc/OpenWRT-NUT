@@ -1,0 +1,13 @@
+# these services do not run on dumb APs
+for service in firewall dnsmasq odhcpd; do
+        if /etc/init.d/$service enabled; then
+                /etc/init.d/$service disable
+                /etc/init.d/$service stop
+        fi
+done
+
+# remove preconfigured ntp pools
+uci -q delete system.ntp.server 2>/dev/null
+uci commit system
+
+exit 0

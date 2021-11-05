@@ -1,0 +1,14 @@
+config driver '%UPSNAME%'
+        option driver %UPSDRIVER%
+        option port auto
+
+config user
+        option username %UPSUSER%
+        option password %UPSPASSWD%
+        option upsmon master
+
+config listen_address
+        option address 0.0.0.0
+        option port 3493
+
+config upsd 'upsd'
